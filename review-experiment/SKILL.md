@@ -1,27 +1,31 @@
 ---
 name: review-experiment
-description: Audit robotics/RL experiment results for validity, causal claims, contracts, and whether the next GPU budget is justified. Use when reviewing logs, checkpoints, reports, or experiment plans.
+description: Challenge and correct robotics/RL experiment designs, and review logs, checkpoints and reports for validity, causal attribution and capability evidence. Use when questioning a training direction, auditing results, or choosing a discriminating next experiment.
 ---
 
 # Review experiment
 
-Do not modify application code during a result review unless the user asks for a fix.
+Review evidence without changing application code unless the user requests a fix. Use the project's current acceptance criteria; inspect installed files under `references/` for an applicable local project profile and read it when present.
 
-Check, in order:
+For optimization, conditioning, dataset independence or demonstration-prior claims, read [the causal and data audit](references/causal-review.md). For racket-return milestones and selecting the next feasibility/learning experiment, read [the progression guide](references/racket-progression.md). Record the review against the same [experiment protocol and evidence ledger](../research-cycle/references/experiment-record.md) used for planning, rather than creating a competing status ledger.
 
-1. Identity: task, route, checkpoint, commit/diff, config digest, seed, GPU, transitions, and output path.
-2. Exposure: what command/offset distribution the policy actually saw, not only the requested CLI or stage label.
-3. Contract: observation/action dimensions, frame and quaternion convention, raw action scale, true shuttle launch, reference impact clock, reset and auto-reset provenance.
-4. Measurement: episode-level C0, impact position, outgoing direction/speed, fall/timeout, and units. Check that paired rows share the intended initial state.
-5. Inference: separate measured facts, supported interpretation, unresolved alternatives, and invalid-run conditions.
-6. Decision: whether the result supports the registered gate, requires one bounded diagnostic, or justifies more seeds/coverage. Keep the next spend smaller than the evidence it is meant to obtain.
+For assumptions, competing explanations, or a proposed training direction, use [design challenge](references/design-challenge.md). When correction and execution are already authorized, carry the reviewed plan into the bounded experiment; do not stop at listing objections. For an evidenced defect in the skills themselves, use `reflect-skills` when maintenance is authorized.
 
-7. Implementation closure: compare measured activation/exposure with the intended intervention. For a proposed bug fix require a relevant regression check plus a bounded real runtime check for simulator lifecycle changes. Return to the original hypothesis after validation; do not substitute a new experiment plan for proving that the modified code behaves as intended.
+Check:
 
-8. Milestone position: every review must state the current V2 milestone, its registered gate, the evidence status (`planned`, `ready`, `running`, `measured`, `passed`, `blocked`, or `invalid`), what this run unlocks, and the smallest remaining blocker. Do not describe local training progress as milestone progress unless the gate evidence is measured.
+1. Identity: task, checkpoint, commit plus dirty diff, config and asset/reference hashes, seed, device, sample count and output paths.
+2. Implementation exposure: what commands, phase transitions, offsets, rewards and contacts actually occurred, not just requested flags or training steps.
+3. Contract: observation/action dimensions and ordering, coordinate/quaternion conventions, raw action scale, reset and auto-reset provenance, release/contact clocks and actual runtime geometry/filter configuration.
+4. Measurement: raw episode outcomes, units, all termination reasons and denominators, failure codes and relevant confidence/coverage. Keep paired A/B initial states matched. Treat truncation or an unknown ending as its own category, not an observed success or failure. Use domain-appropriate events; do not import shuttle/racket metrics into ball grasp/throw/catch experiments.
+5. Inference: distinguish measured facts, supported interpretation, unresolved alternatives and invalid-run conditions. A negative outcome does not automatically imply optimizer failure; first verify the intended intervention executed. Updates occurring, effective learning and sufficient optimization are separate claims. Training across different versions/tasks/initializers cannot be summed as convergence evidence; same-input local replay cannot establish whole-policy or closed-loop causality.
+6. Gate decision: state the applicable milestone, status, what the run establishes or unlocks, the smallest blocker, and whether one diagnostic or further coverage is justified. Do not substitute process completion or reward for gate evidence.
 
-Distinguish command target, racket sweet center, and actual contact/cork point, each with its clock. Inspect active USD/C0 geometry and filters before attributing an implausible collision to policy behavior. Train/eval launch offsets and checkpoint-restored RNG can change the experiment even when CLI seeds and labels look identical. Do not re-probe an already established capability merely to postpone the authorized next training step.
+For inherited-policy training, reconstruct the selected checkpoint's actual ancestry and retained updates separately from consumed budget, rollbacks, and diagnostics. Compare learning outcomes at matched exposure. A parent-output drift monitor measures change, not task degradation; distinguish it from an auxiliary retention loss and from physical failure. Check whether a stop skipped final frozen evaluation or the final standard log row. Rollout metrics recorded after update N usually describe trajectories collected by the policy before update N, unless explicitly measured otherwise.
 
-For M3.1, require raw episode records and paired `target` vs `matched_p_contact`. Compute or inspect paired ΔC0 and `K_p = Δp_impact / Δp_command`; a missing or null signed response is a diagnostic gap, not a conditioning claim. A report with `dirty=true` must preserve the actual patch or diff needed to reproduce it.
+Check the amplitude and provenance of evaluation noise against the actor's own training std. Separate deterministic task performance, own-noise behavior and additional stress tolerance. A stress-only failure must not be relabeled as training-distribution collapse; an own-noise pass does not erase a registered stress-gate failure.
 
-Use status words `planned`, `ready`, `running`, `blocked`, `implemented_unmeasured`, `measured`, `passed`, `invalid`, and `withdrawn`; do not use `completed` as scientific evidence.
+For simulator lifecycle fixes, require relevant regression evidence and a bounded actual runtime check. Preserve raw data and corrections to earlier claims. If dirty=true, preserve the diff required to reproduce the result. Missing measurements remain unknown, never zero.
+
+Use the project's existing status vocabulary. Separate implementation status from experiment validity and capability pass/fail. Report actionable findings with evidence location and impact, then a proportionate next step; do not launch additional runs as part of a read-only review.
+
+Review correctness, hard protection, ordinary learning outcomes, scientific promotion and authorization separately. Distinguish measured physical penetration from FK-only geometric overlap. Retain severe-event protections while allowing valid, authorized learning below final product criteria. State whether a suspected defect is verified, contradicted or untested; do not publish a risk as a confirmed defect. Scope retained historical numbers and version-specific defects to a clearly labeled case, never a default rule.
